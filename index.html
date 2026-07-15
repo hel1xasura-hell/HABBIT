@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Habit Recovery</title>
+<meta name="description" content="A private, offline-first companion for quitting unwanted habits.">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b8a85">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Habit Recovery">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+
+<!-- Fonts (cached offline by the service worker after first visit; system fonts are the fallback) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/screens.css">
+</head>
+<body>
+<div id="app">
+  <!-- Filled in by js/app.js after the auth check passes -->
+</div>
+
+<!-- Core (storage / auth / routing) -->
+<script src="js/core/db.js"></script>
+<script src="js/core/auth.js"></script>
+<script src="js/core/router.js"></script>
+
+<!-- Services (business logic, no DOM) -->
+<script src="js/services/habits.js"></script>
+<script src="js/services/journal.js"></script>
+<script src="js/services/urge.js"></script>
+
+<!-- UI (screens) -->
+<script src="js/ui/components.js"></script>
+<script src="js/ui/dashboard.js"></script>
+<script src="js/ui/checkin.js"></script>
+<script src="js/ui/urgeScreen.js"></script>
+<script src="js/ui/journalScreen.js"></script>
+<script src="js/ui/triggerScreen.js"></script>
+<script src="js/ui/goalsScreen.js"></script>
+<script src="js/ui/achievementsScreen.js"></script>
+<script src="js/ui/statsScreen.js"></script>
+<script src="js/ui/calendarScreen.js"></script>
+<script src="js/ui/settingsScreen.js"></script>
+
+<!-- Bootstrap -->
+<script src="js/app.js"></script>
+</body>
+</html>

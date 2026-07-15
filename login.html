@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Log In · Habit Recovery</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b8a85">
+<link rel="icon" href="icons/icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+<div class="login-shell">
+  <div class="login-mark">🌅</div>
+  <div class="eyebrow" style="font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;">Habit Recovery</div>
+  <h1 style="font-size:26px;margin-bottom:6px;">Welcome back</h1>
+  <p style="color:var(--text-muted);font-size:13.5px;margin-bottom:26px;">Log in with the Access ID your admin gave you.</p>
+
+  <div id="loginError" class="login-error hidden"></div>
+
+  <form id="loginForm" autocomplete="on">
+    <div class="field">
+      <label for="accessId">Access ID</label>
+      <input type="text" id="accessId" name="accessId" autocomplete="username" placeholder="Enter your Access ID" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required>
+    </div>
+    <button type="submit" class="btn btn-primary" style="margin-top:8px;">Login</button>
+  </form>
+
+  <p style="text-align:center;color:var(--text-muted);font-size:12px;margin-top:22px;">Accounts are provisioned by an administrator.<br>Contact them if you don't have an Access ID.</p>
+</div>
+
+<script src="js/core/db.js"></script>
+<script src="js/core/auth.js"></script>
+<script>
+  // Respect saved theme preference on the login screen too.
+  document.documentElement.setAttribute('data-theme', localStorage.getItem('habitapp_theme') || 'light');
+
+  (async function initLogin() {
+    await DB.openDB();
+    await Auth.ensureSeedUser();
+    if (Auth.isLoggedIn()) { location.href = 'index.html'; return; }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const accessId = document.getElementById('accessId').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('loginError');
+      const result = await Auth.login(accessId, password);
+      if (result.ok) {
+        location.href = 'index.html';
+      } else {
+        errorEl.textContent = result.error;
+        errorEl.classList.remove('hidden');
+      }
+    });
+  })();
+</script>
+</body>
+</html>
