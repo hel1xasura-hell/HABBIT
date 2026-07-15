@@ -1,0 +1,81 @@
+/* ==========================================================================
+   DESIGN TOKENS
+   Signature concept: "Sunrise Ring" — every clean day is a small dawn.
+   Palette avoids generic wellness-teal / cream-terracotta defaults:
+   deep ink + dusk surfaces, dawn-gold + horizon-teal accents, warm paper light mode.
+   ========================================================================== */
+
+:root {
+  /* ---- Brand palette (named) ---- */
+  --ink: #0c1220;        /* dark background */
+  --dusk: #141c30;       /* dark surface */
+  --dusk-2: #1c2740;      /* dark surface, elevated */
+  --dusk-3: #263352;      /* dark surface, hover/active */
+  --dawn: #f2a63d;        /* primary accent — sunrise gold */
+  --dawn-soft: #f7c477;
+  --horizon: #1b8a85;     /* secondary accent — deep horizon teal */
+  --horizon-soft: #2ea39e;
+  --coral: #e8615d;       /* relapse / danger */
+  --sage: #45b378;        /* success */
+  --paper: #f5f7f7;       /* light background (cool, not cream) */
+  --paper-2: #ffffff;     /* light surface */
+  --mist: #e5eaea;        /* light border */
+  --slate: #5c6b7a;       /* muted text, light mode */
+
+  /* ---- Typography ---- */
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+
+  /* ---- Radii / shadows / motion ---- */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --r-pill: 999px;
+  --shadow-soft: 0 8px 24px rgba(12, 18, 32, 0.10);
+  --shadow-lift: 0 16px 40px rgba(12, 18, 32, 0.16);
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --dur: 220ms;
+
+  /* ---- Layout ---- */
+  --nav-h: 72px;
+  --max-w: 480px;
+}
+
+/* ---- Light theme (default) ---- */
+:root,
+[data-theme="light"] {
+  --bg: var(--paper);
+  --surface: var(--paper-2);
+  --surface-alt: #eef1f1;
+  --border: var(--mist);
+  --text: #10161f;
+  --text-muted: var(--slate);
+  --accent: var(--horizon);
+  --accent-2: var(--dawn);
+  --shadow: var(--shadow-soft);
+  --overlay: rgba(12, 18, 32, 0.5);
+}
+
+/* ---- Dark theme ---- */
+[data-theme="dark"] {
+  --bg: var(--ink);
+  --surface: var(--dusk);
+  --surface-alt: var(--dusk-2);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #f2f4f8;
+  --text-muted: #93a0b4;
+  --accent: var(--dawn);
+  --accent-2: var(--horizon-soft);
+  --shadow: var(--shadow-lift);
+  --overlay: rgba(3, 6, 14, 0.65);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
