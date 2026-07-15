@@ -1,0 +1,1 @@
+Reserved for future assets (custom fonts, splash screen source images, additional icon sizes) needed when packaging this app with Capacitor/Cordova or porting it to React Native/Flutter. Empty for now — the web build only needs `icons/` and the Google Fonts loaded in `index.html`/`login.html`.
