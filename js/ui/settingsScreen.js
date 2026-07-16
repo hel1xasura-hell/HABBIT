@@ -49,7 +49,7 @@ async function renderSettings() {
 
       <div class="section-title">Account</div>
       <div class="card">
-        <div class="link-row" onclick="SettingsScreen.changePin()" role="button">Change PIN <span class="chev">soon</span></div>
+        <div class="link-row" onclick="SettingsScreen.changePin()" role="button">Change PIN <span class="chev">›</span></div>
         <div class="link-row" onclick="SettingsScreen.aboutModal()" role="button">About <span class="chev">›</span></div>
         <div class="link-row" onclick="SettingsScreen.privacyModal()" role="button">Privacy <span class="chev">›</span></div>
       </div>
@@ -124,9 +124,38 @@ function resetData() {
 
 function changePin() {
   Components.openSheet(`
-    <h3 style="margin-bottom:10px;">Change PIN</h3>
-    <p style="font-size:13.5px;color:var(--text-muted);">Account credentials are managed by an admin. Self-service PIN changes are coming in a future update.</p>
-  `, { center: true });
+    <h3 style="margin-bottom:16px;">Change PIN / Password</h3>
+    <div id="pinError" class="login-error hidden"></div>
+    <div class="field"><label>Current password</label><input type="password" id="pinCurrent" placeholder="Enter current password"></div>
+    <div class="field"><label>New PIN / password</label><input type="password" id="pinNew" placeholder="At least 4 characters"></div>
+    <div class="field"><label>Confirm new PIN / password</label><input type="password" id="pinConfirm" placeholder="Re-enter new password"></div>
+    <button class="btn btn-primary" onclick="SettingsScreen.submitPinChange()">Save new password</button>
+  `);
+}
+
+async function submitPinChange() {
+  const current = document.getElementById('pinCurrent').value;
+  const next = document.getElementById('pinNew').value;
+  const confirm = document.getElementById('pinConfirm').value;
+  const errorEl = document.getElementById('pinError');
+  errorEl.classList.add('hidden');
+
+  if (next !== confirm) {
+    errorEl.textContent = 'New password and confirmation do not match.';
+    errorEl.classList.remove('hidden');
+    return;
+  }
+
+  const session = Auth.getSession();
+  const result = await Auth.changePassword(session.userId, current, next);
+  if (!result.ok) {
+    errorEl.textContent = result.error;
+    errorEl.classList.remove('hidden');
+    return;
+  }
+
+  Components.closeSheet();
+  Components.showToast('Password updated');
 }
 
 function aboutModal() {
@@ -151,4 +180,5 @@ function logout() {
   }, { danger: false });
 }
 
-window.SettingsScreen = { renderSettings, toggleTheme, applyTheme, archiveHabit, exportData, triggerImport, handleImportFile, resetData, changePin, aboutModal, privacyModal, logout };
+window.SettingsScreen = { renderSettings, toggleTheme, applyTheme, archiveHabit, exportData, triggerImport, handleImportFile, resetData, changePin, submitPinChange, aboutModal, privacyModal, logout };
+                                                                                                                                                      
