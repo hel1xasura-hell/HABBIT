@@ -49,7 +49,7 @@ async function renderSettings() {
 
       <div class="section-title">Account</div>
       <div class="card">
-        <div class="link-row" onclick="SettingsScreen.changePin()" role="button">Change PIN <span class="chev">›</span></div>
+        <div class="link-row" onclick="SettingsScreen.changePin()" role="button">Change Access ID / PIN <span class="chev">›</span></div>
         <div class="link-row" onclick="SettingsScreen.aboutModal()" role="button">About <span class="chev">›</span></div>
         <div class="link-row" onclick="SettingsScreen.privacyModal()" role="button">Privacy <span class="chev">›</span></div>
       </div>
@@ -123,31 +123,35 @@ function resetData() {
 }
 
 function changePin() {
+  const session = Auth.getSession();
   Components.openSheet(`
-    <h3 style="margin-bottom:16px;">Change PIN / Password</h3>
+    <h3 style="margin-bottom:6px;">Access ID &amp; Password</h3>
+    <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;">Set your own login instead of the default admin account. Your current password is always required to confirm changes.</p>
     <div id="pinError" class="login-error hidden"></div>
+    <div class="field"><label>New Access ID</label><input type="text" id="pinAccessId" placeholder="Choose your own Access ID" value="${Components.escapeHtml(session?.accessId || '')}"></div>
     <div class="field"><label>Current password</label><input type="password" id="pinCurrent" placeholder="Enter current password"></div>
-    <div class="field"><label>New PIN / password</label><input type="password" id="pinNew" placeholder="At least 4 characters"></div>
-    <div class="field"><label>Confirm new PIN / password</label><input type="password" id="pinConfirm" placeholder="Re-enter new password"></div>
-    <button class="btn btn-primary" onclick="SettingsScreen.submitPinChange()">Save new password</button>
+    <div class="field"><label>New password <span style="font-weight:400;color:var(--text-muted);">(leave blank to keep it)</span></label><input type="password" id="pinNew" placeholder="At least 4 characters"></div>
+    <div class="field"><label>Confirm new password</label><input type="password" id="pinConfirm" placeholder="Re-enter new password"></div>
+    <button class="btn btn-primary" onclick="SettingsScreen.submitPinChange()">Save changes</button>
   `);
 }
 
 async function submitPinChange() {
+  const newAccessId = document.getElementById('pinAccessId').value;
   const current = document.getElementById('pinCurrent').value;
   const next = document.getElementById('pinNew').value;
   const confirm = document.getElementById('pinConfirm').value;
   const errorEl = document.getElementById('pinError');
   errorEl.classList.add('hidden');
 
-  if (next !== confirm) {
+  if (next && next !== confirm) {
     errorEl.textContent = 'New password and confirmation do not match.';
     errorEl.classList.remove('hidden');
     return;
   }
 
   const session = Auth.getSession();
-  const result = await Auth.changePassword(session.userId, current, next);
+  const result = await Auth.updateAccount(session.userId, { currentPassword: current, newAccessId, newPassword: next });
   if (!result.ok) {
     errorEl.textContent = result.error;
     errorEl.classList.remove('hidden');
@@ -155,7 +159,8 @@ async function submitPinChange() {
   }
 
   Components.closeSheet();
-  Components.showToast('Password updated');
+  Components.showToast('Account updated');
+  await Router.renderRoute();
 }
 
 function aboutModal() {
@@ -181,4 +186,4 @@ function logout() {
 }
 
 window.SettingsScreen = { renderSettings, toggleTheme, applyTheme, archiveHabit, exportData, triggerImport, handleImportFile, resetData, changePin, submitPinChange, aboutModal, privacyModal, logout };
-                                                                                                                                                      
+                                                                                                                                                                        
