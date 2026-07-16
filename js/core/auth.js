@@ -7,9 +7,10 @@
  * call DB.put('users', {...}) / DB.remove('users', id) — this module
  * doesn't need to change.
  *
- * Session state is a lightweight flag in localStorage (fine for settings /
- * non-sensitive session data per the storage spec — real credentials never
- * touch localStorage).
+ * Session state is kept in sessionStorage (cleared when the browser/app is
+ * fully closed) rather than localStorage — this means the Access ID and
+ * password are required every time the app is freshly opened, not just once
+ * ever. Real credentials never touch either storage; only a session flag does.
  * ------------------------------------------------------------------------
  */
 
@@ -37,13 +38,13 @@ async function login(accessId, password) {
   );
   if (!match) return { ok: false, error: 'Incorrect Access ID or password.' };
 
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: match.id, accessId: match.accessId, name: match.name, at: Date.now() }));
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ userId: match.id, accessId: match.accessId, name: match.name, at: Date.now() }));
   return { ok: true, user: match };
 }
 
 function getSession() {
   try {
-    return JSON.parse(localStorage.getItem(SESSION_KEY));
+    return JSON.parse(sessionStorage.getItem(SESSION_KEY));
   } catch {
     return null;
   }
@@ -54,7 +55,24 @@ function isLoggedIn() {
 }
 
 function logout() {
-  localStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
 }
 
-window.Auth = { ensureSeedUser, login, getSession, isLoggedIn, logout };
+/**
+ * Self-service password/PIN change for the logged-in user.
+ * Requires the current password to match before writing the new one.
+ * Returns { ok, error }.
+ */
+async function changePassword(userId, currentPassword, newPassword) {
+  const user = await DB.get('users', userId);
+  if (!user) return { ok: false, error: 'Account not found.' };
+  if (user.password !== currentPassword) return { ok: false, error: 'Current password is incorrect.' };
+  if (!newPassword || newPassword.length < 4) return { ok: false, error: 'New password/PIN must be at least 4 characters.' };
+
+  user.password = newPassword;
+  await DB.put('users', user);
+  return { ok: true };
+}
+
+window.Auth = { ensureSeedUser, login, getSession, isLoggedIn, logout, changePassword };
+
