@@ -74,5 +74,39 @@ async function changePassword(userId, currentPassword, newPassword) {
   return { ok: true };
 }
 
-window.Auth = { ensureSeedUser, login, getSession, isLoggedIn, logout, changePassword };
+/**
+ * Self-service account update — lets a logged-in user set their own Access ID
+ * and/or password (e.g. after first logging in on the seeded "admin" account).
+ * Always requires the CURRENT password. newPassword is optional — pass an
+ * empty string to keep the existing password and only change the Access ID.
+ * Returns { ok, error, user }.
+ */
+async function updateAccount(userId, { currentPassword, newAccessId, newPassword }) {
+  const user = await DB.get('users', userId);
+  if (!user) return { ok: false, error: 'Account not found.' };
+  if (user.password !== currentPassword) return { ok: false, error: 'Current password is incorrect.' };
+
+  const trimmedId = (newAccessId || '').trim();
+  if (!trimmedId) return { ok: false, error: 'Access ID cannot be empty.' };
+
+  if (trimmedId.toLowerCase() !== user.accessId.toLowerCase()) {
+    const all = await DB.getAll('users');
+    const clash = all.some((u) => u.id !== userId && u.accessId.trim().toLowerCase() === trimmedId.toLowerCase());
+    if (clash) return { ok: false, error: 'That Access ID is already taken.' };
+  }
+
+  if (newPassword) {
+    if (newPassword.length < 4) return { ok: false, error: 'New password/PIN must be at least 4 characters.' };
+    user.password = newPassword;
+  }
+  user.accessId = trimmedId;
+  await DB.put('users', user);
+
+  // Keep the active session in sync with the new Access ID.
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ userId: user.id, accessId: user.accessId, name: user.name, at: Date.now() }));
+
+  return { ok: true, user };
+}
+
+window.Auth = { ensureSeedUser, login, getSession, isLoggedIn, logout, changePassword, updateAccount };
 
